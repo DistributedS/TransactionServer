@@ -16,7 +16,7 @@ import utils.Transaction;
 public class Client {
 
     String host = "127.0.0.1";
-    static final int port = 80085;
+    static final int port = 8008;
     Random random = new Random();
     
     public void run() {
@@ -32,12 +32,14 @@ public class Client {
             //Open Transaction
             message = new Message(OPEN_TRANS, null);
             Transaction readObject;
+            System.out.println("Opening Transaction");
             writeToServer.writeObject(message);
             
             // Read account balance 1
             int accountID = getRandomInt(0, 9);
             readObject = new Transaction(accountID, 0);
             message = new Message(READ, readObject);
+            System.out.println("Send Read Transaction.");
             writeToServer.writeObject(message);
             
             // Recieve account balance 1 and print output

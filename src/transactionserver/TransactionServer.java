@@ -16,7 +16,7 @@ import utils.Transaction;
 
 public class TransactionServer {
     
-    static final int serverPort = 80085;
+    static final int serverPort = 8008;
     ServerSocket serverSocket;
     transactionserver.DataManager dataManager;
     transactionserver.LockManager lockManager;
@@ -40,7 +40,6 @@ public class TransactionServer {
     
     public void run() {
     // start serving clients in server loop ...
-    // ...
 
         try{
             while(true){
@@ -85,60 +84,66 @@ public class TransactionServer {
                 Logger.getLogger(TransactionServer.class.getName()).log(Level.SEVERE, null, ex);
             }
             
-            // reading message
-            try {
-                message = (Message) readFromClient.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-                System.err.println("[TransactionServer.run] Message could not be read from object stream.");
-                e.printStackTrace();
-                System.exit(1);
-            }
+            loop: while(true){
+                
+                // reading message
+                try {
+                    message = (Message) readFromClient.readObject();
+                } catch (IOException | ClassNotFoundException e) {
+                    System.err.println("[TransactionServer.run] Message could not be read from object stream.");
+                    e.printStackTrace();
+                    System.exit(1);
+                }
 
-            switch (message.getType()) {
-                case OPEN_TRANS:
-                    // Use transaction manager
-                    transID = transactionManager.assignTransID();
-                    System.out.println("Opened Transaction.");
-                    
-                    break;
-
-                case CLOSE_TRANS:
-                    // Use transaction manager
-                    System.out.println("Transaction Finished");
-                    break;
-                    
-                case READ:
-                    try{
-                        // Use data manager
-                        transaction = (Transaction) message.getContent();
-                        int accountID = transaction.getAccountID();
-                        // TODO Call datamansger to get balance.
-                        Object resultObject = null;
-                        writeToClient.writeObject(resultObject);
+                switch (message.getType()) {
+                    case OPEN_TRANS:
+                        // Use transaction manager
+                        transID = transactionManager.assignTransID();
+                        System.out.println("Opened Transaction.");
                         
-                    } catch(Exception e){
-                        System.out.println("Error in read.");
-                    }
-                    break;
-                    
-                case WRITE:
-                    try {
-                        transaction = (Transaction) message.getContent();
-                        int accountID = transaction.getAccountID();
-                        int transferAmt = transaction.getAmount();
-                        // TODO Call datamansger to do transaction.
-                        Object resultObject = null;
-                        writeToClient.writeObject(resultObject);
-                        
-                    } catch(Exception e){
-                        System.out.println("Error in write.");
-                    }
+                        break;
 
-                    break;
+                    case CLOSE_TRANS:
+                        // Use transaction manager
+                        System.out.println("Closed Transaction");
+                        break loop;
 
-                default:
-                    System.err.println("[ServerThread.run] Warning: Message type not implemented");
-            }
+                    case READ:
+                        System.out.println("Got read instruction.");
+                        try{
+                            transaction = (Transaction) message.getContent();
+                            int accountID = transaction.getAccountID();
+
+                            // TODO Call datamansger to get balance.
+                            Object resultObject = dataManager.getAccountBalance(accountID);
+                            writeToClient.writeObject(resultObject);
+
+                        } catch(Exception e){
+                            System.out.println("Error in read.");
+                        }
+                        break;
+
+                    case WRITE:
+                        System.out.println("Got write instruction.");
+                        try {
+                            transaction = (Transaction) message.getContent();
+                            int accountID = transaction.getAccountID();
+                            int transferAmt = transaction.getAmount();
+
+                            // TODO Call datamansger to do transaction.
+                            Object resultObject = dataManager.doAccountTrans(accountID, transferAmt);
+                            writeToClient.writeObject(resultObject);
+
+                        } catch(Exception e){
+                            System.out.println("Error in write.");
+                        }
+
+                        break;
+
+                    default:
+                        System.err.println("[ServerThread.run] Warning: Message type not implemented");
+                }
+            } // End while loop
         }
     }
     

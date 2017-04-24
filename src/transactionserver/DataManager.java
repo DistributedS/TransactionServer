@@ -10,4 +10,12 @@ public class DataManager {
         accounts = new int[10];
         fill(accounts, 10);
     }
+    
+    public int getAccountBalance(int accountID){
+        return accounts[accountID];
+    }
+    
+    public int doAccountTrans(int accountID, int transferAmt){
+        return accounts[accountID];
+    }
 }
