@@ -16,6 +16,7 @@ public class DataManager {
     }
     
     public int doAccountTrans(int accountID, int transferAmt){
+        accounts[accountID] += transferAmt;
         return accounts[accountID];
     }
 }

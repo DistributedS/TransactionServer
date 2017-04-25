@@ -39,7 +39,7 @@ public class Client {
             int accountID = getRandomInt(0, 9);
             readObject = new Transaction(accountID, 0);
             message = new Message(READ, readObject);
-            System.out.println("Send Read Transaction.");
+            System.out.println("Sending Read Transaction.");
             writeToServer.writeObject(message);
             
             // Recieve account balance 1 and print output
@@ -61,6 +61,7 @@ public class Client {
             int depositAccountID = getRandomInt(0, 9);
             readObject = new Transaction(depositAccountID, 0);
             message = new Message(READ, readObject);
+            System.out.println("Sending Read Transaction.");
             writeToServer.writeObject(message);
             
             // Recieve account balance 2 and print output

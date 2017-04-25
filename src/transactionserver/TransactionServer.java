@@ -109,7 +109,7 @@ public class TransactionServer {
                         break loop;
 
                     case READ:
-                        System.out.println("Got read instruction.");
+                        System.out.println("Got Read Instruction.");
                         try{
                             transaction = (Transaction) message.getContent();
                             int accountID = transaction.getAccountID();
@@ -124,7 +124,7 @@ public class TransactionServer {
                         break;
 
                     case WRITE:
-                        System.out.println("Got write instruction.");
+                        System.out.println("Got Write Instruction.");
                         try {
                             transaction = (Transaction) message.getContent();
                             int accountID = transaction.getAccountID();
