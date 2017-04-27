@@ -11,6 +11,13 @@ public class Lock {
     private LockTypes lockType; // the current type
     
     public synchronized void acquire(TransID trans, LockTypes aLockType ){
+        //Check if something is conflict, checks for cases where you it is not a conflict -> rest is conflicts.
+        //boolean isConfict
+        // no conflict if:
+        // 1) lock holder empty -> all other holds lock holders.
+        // 2) you are sole lock holder.
+        // 3) currentlock type is read and newlocktype is also read
+        // else lock is not conflict.
         while(/*another transaction holds the lock in conflicting mode*/) {
         try {
         wait();

@@ -18,15 +18,15 @@ public class TransactionServer {
     
     static final int serverPort = 8008;
     ServerSocket serverSocket;
-    transactionserver.DataManager dataManager;
-    transactionserver.LockManager lockManager;
-    transactionserver.TransactionManager transactionManager;
+    public static transactionserver.DataManager dataManager;
+    public static transactionserver.LockManagerOld lockManager;
+    public static transactionserver.TransactionManager transactionManager;
     
     public TransactionServer(){
         
         // Create instance of Managers
         dataManager = new DataManager();
-        lockManager = new LockManager();
+        lockManager = new LockManagerOld();
         transactionManager = new TransactionManager();
         
         // Create server socket
@@ -131,7 +131,7 @@ public class TransactionServer {
                             int transferAmt = transaction.getAmount();
 
                             // TODO Call datamansger to do transaction.
-                            Object resultObject = dataManager.doAccountTrans(accountID, transferAmt);
+                            Object resultObject = dataManager.setAccountBalance(accountID, transferAmt);
                             writeToClient.writeObject(resultObject);
 
                         } catch(Exception e){

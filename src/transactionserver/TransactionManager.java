@@ -11,5 +11,7 @@ public class TransactionManager {
         return transID++;
     }
     
+    // Keep track of transactions? Array...?
+    
     
 }
