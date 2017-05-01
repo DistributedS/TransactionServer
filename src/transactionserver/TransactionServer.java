@@ -19,14 +19,14 @@ public class TransactionServer {
     static final int serverPort = 8008;
     ServerSocket serverSocket;
     public static transactionserver.DataManager dataManager;
-    public static transactionserver.LockManagerOld lockManager;
     public static transactionserver.TransactionManager transactionManager;
+    public static transactionserver.LockManager lockManager;
     
     public TransactionServer(){
         
         // Create instance of Managers
         dataManager = new DataManager();
-        lockManager = new LockManagerOld();
+        lockManager = new LockManager();
         transactionManager = new TransactionManager();
         
         // Create server socket
@@ -105,6 +105,7 @@ public class TransactionServer {
 
                     case CLOSE_TRANS:
                         // Use transaction manager
+                        dataManager.printAccounts();
                         System.out.println("Closed Transaction");
                         break loop;
 
@@ -114,8 +115,8 @@ public class TransactionServer {
                             transaction = (Transaction) message.getContent();
                             int accountID = transaction.getAccountID();
 
-                            // TODO Call datamansger to get balance.
-                            Object resultObject = dataManager.getAccountBalance(accountID);
+                            // TODO Call datamansger to get balance.                     
+                            Object resultObject = dataManager.getAccountBalance(accountID, transID);
                             writeToClient.writeObject(resultObject);
 
                         } catch(Exception e){
@@ -131,7 +132,7 @@ public class TransactionServer {
                             int transferAmt = transaction.getAmount();
 
                             // TODO Call datamansger to do transaction.
-                            Object resultObject = dataManager.setAccountBalance(accountID, transferAmt);
+                            Object resultObject = dataManager.setAccountBalance(accountID, transID, transferAmt);
                             writeToClient.writeObject(resultObject);
 
                         } catch(Exception e){
