@@ -33,7 +33,12 @@ public class LockManager implements LockTypes {
                 // Share a read lock
                 objAccount.setLockType(lockType);
                 System.out.println("[Lock Manager][Transaction "+transID+"] Sharing read lock on account "+accountID+".");
-            }
+                
+            } else if(objAccount.getLockType() == NONE) {
+                objAccount.setLockType(lockType);
+                System.out.println("[Lock Manager][Transaction "+transID+"] Set type "+lockType+" on account "+accountID+".");
+                
+            } else {
             
             // set Write with read -> wait
             // set Read with a write -> wait
@@ -45,10 +50,12 @@ public class LockManager implements LockTypes {
             //}
             if(lockType == READ){
                 waitType = READ;
+                //System.out.println("Wait type is READ for account "+accountID);
             }
-           
-            while(objAccount.getLockType() != waitType || objAccount.getLockType() != NONE) {
+            System.out.println("Wait type is "+waitType+" lock type on account "+accountID+" is "+objAccount.getLockType());
+            while(objAccount.getLockType() != 3 || objAccount.getLockType() != waitType) {
                 try {
+                    System.out.println("waiting");
                     wait();
                 }catch ( InterruptedException e){/*...*/ }
             }
@@ -57,6 +64,7 @@ public class LockManager implements LockTypes {
             //Out of waiting loop, can set locks now
             objAccount.setLockType(lockType);
             System.out.println("[Lock Manager][Transaction "+transID+"] Set type "+lockType+" on account "+accountID+".");
+            }
             
         }
         // If there is not lock on the account and not in hash map.
@@ -70,7 +78,7 @@ public class LockManager implements LockTypes {
     // synchronize this one because we want to remove all entries
     public synchronized void unLock(int accountID, Account objAccount, int transID) {
         objAccount.removeLock();
-        System.out.println("[LockManager][Transaction "+transID+"] Removed lock on account "+accountID+".");
+        System.out.println("[Lock Manager][Transaction "+transID+"] Removed lock on account "+accountID+".");
     
     }
     

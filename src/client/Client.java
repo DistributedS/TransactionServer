@@ -32,46 +32,46 @@ public class Client {
             //Open Transaction
             message = new Message(OPEN_TRANS, null);
             Transaction readObject;
-            System.out.println("Opening Transaction");
+            System.out.println("[Client] Opening Transaction");
             writeToServer.writeObject(message);
             
             // Read account balance 1
             int accountID = getRandomInt(0, 9);
             readObject = new Transaction(accountID, 0);
             message = new Message(READ, readObject);
-            System.out.println("Sending Read Transaction.");
+            System.out.println("[Client] Sending Read Transaction.");
             writeToServer.writeObject(message);
             
             // Recieve account balance 1 and print output
             int balance = (Integer) readFromServer.readObject();
-            System.out.println("Account "+accountID+" has balance: "+balance);
+            System.out.println("[Client] Account "+accountID+" has balance: "+balance);
             
             // Withdraw account balance 1
             int transferAmount = getRandomInt(0, 10);
             Transaction transObject = new Transaction(accountID, -transferAmount);
             message = new Message(WRITE, transObject);
-            System.out.println("Withdrawing from account "+accountID+" with amount "+transferAmount);
+            System.out.println("[Client] Withdrawing "+transferAmount+" dollars from account "+accountID);
             writeToServer.writeObject(message);
             
             // Recieve account balance 1 and print output
             int postBalance = (Integer) readFromServer.readObject();
-            System.out.println("Account "+accountID+" has new balance after withdraw: "+postBalance);
+            System.out.println("[Client] Account "+accountID+" has new balance after withdraw: "+postBalance);
             
             // Read balance of account to recieve funds
             int depositAccountID = getRandomInt(0, 9);
             readObject = new Transaction(depositAccountID, 0);
             message = new Message(READ, readObject);
-            System.out.println("Sending Read Transaction.");
+            System.out.println("[Client] Sending Read Transaction.");
             writeToServer.writeObject(message);
             
             // Recieve account balance 2 and print output
             balance = (Integer) readFromServer.readObject();
-            System.out.println("Account "+depositAccountID+" has balance "+balance+" before deposit.");
+            System.out.println("[Client] Account "+depositAccountID+" has balance "+balance+" before deposit.");
             
             // Withdraw account balance 1
             transObject = new Transaction(depositAccountID, transferAmount);
             message = new Message(WRITE, transObject);
-            System.out.println("Depositing in account "+depositAccountID+" with amount "+transferAmount);
+            System.out.println("[Client] Depositing in account "+depositAccountID+" with amount "+transferAmount);
             writeToServer.writeObject(message);
             
             // Close Transaction
@@ -80,7 +80,7 @@ public class Client {
             
 
         } catch (IOException | ClassNotFoundException ex) {
-            System.err.println("[Client.run] Error occurred");
+            System.err.println("[Client] Error occurred");
         }
     }
     
@@ -90,10 +90,13 @@ public class Client {
     
     
     public static void main(String[] args) {
+
+        for (int i=100; i>0; i--) {
+            
+            Client client = new Client();
         
-        Client client = new Client();
-        
-        client.run();
+            client.run();
+        }
     } 
 }
 

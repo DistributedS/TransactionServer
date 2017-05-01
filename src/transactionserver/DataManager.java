@@ -11,19 +11,18 @@ public class DataManager implements LockTypes {
     
     public DataManager(){
         accounts = new Account[10];
-        fill(accounts, new Account(10));
+        //fill(accounts, new Account(10));
         
-        
-        
-        /*for(int i; i<accounts.length; i++){
+        for(int i=0; i<accounts.length; i++){
             accounts[i] = new Account(10);
-        }*/
+        }
     }
     
     public int getAccountBalance(int accountID, int transID){
         TransactionServer.lockManager.setLock(accountID, accounts[accountID], transID, READ);
         int balance = accounts[accountID].getBalance();
         TransactionServer.lockManager.unLock(accountID, accounts[accountID], transID);
+        //this.printAccounts();
         
         return balance;
     }
@@ -33,15 +32,21 @@ public class DataManager implements LockTypes {
         accounts[accountID].addToBalance(transferAmt);
         int balance = accounts[accountID].getBalance();
         TransactionServer.lockManager.unLock(accountID, accounts[accountID], transID);
-        
+        //this.printAccounts();
+
         return balance;
     }
     
     public void printAccounts(){
-        System.out.println("---------Balance for all accounts:----------");
+        int totalBalance = 0;
+        System.out.println("--------------Balance for all accounts:---------------");
         for(int i = 0; i<accounts.length; i++){
-            System.out.print(" ["+accounts[i].getBalance()+"] ");
+            int accountBalance = accounts[i].getBalance();
+            totalBalance += accountBalance;
+            System.out.print(" ["+accountBalance+"] ");
         }
-        System.out.println("--------------------------------------------");
+        System.out.print("\n");
+        System.out.println("Total accounts balance: "+totalBalance);
+        System.out.println("------------------------------------------------------");
     }
 }
