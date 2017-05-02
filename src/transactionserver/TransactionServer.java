@@ -90,7 +90,7 @@ public class TransactionServer {
                 try {
                     message = (Message) readFromClient.readObject();
                 } catch (IOException | ClassNotFoundException e) {
-                    System.err.println("[Transaction Server] Message could not be read from object stream.");
+                    System.err.println("[Transaction Server]: Message could not be read from object stream.");
                     e.printStackTrace();
                     System.exit(1);
                 }
@@ -99,18 +99,18 @@ public class TransactionServer {
                     case OPEN_TRANS:
                         // Use transaction manager
                         transID = transactionManager.assignTransID();
-                        System.out.println("[Transaction Server][Transaction "+transID+"] Opened Transaction.");
+                        System.out.println("[Transaction Server][Transaction "+transID+"]: Opened Transaction.");
                         
                         break;
 
                     case CLOSE_TRANS:
                         // Use transaction manager
                         dataManager.printAccounts();
-                        System.out.println("[Transaction Server][Transaction "+transID+"] Closed Transaction");
+                        System.out.println("[Transaction Server][Transaction "+transID+"]: Closed Transaction");
                         break loop;
 
                     case READ:
-                        System.out.println("[Transaction Server][Transaction "+transID+"] Got Read Instruction.");
+                        System.out.println("[Transaction Server][Transaction "+transID+"]: Got Read Instruction.");
                         try{
                             transaction = (Transaction) message.getContent();
                             int accountID = transaction.getAccountID();
@@ -120,12 +120,12 @@ public class TransactionServer {
                             writeToClient.writeObject(resultObject);
 
                         } catch(Exception e){
-                            System.out.println("[Transaction Server][Transaction "+transID+"] Error in read.");
+                            System.out.println("[Transaction Server][Transaction "+transID+"]: Error in read.");
                         }
                         break;
 
                     case WRITE:
-                        System.out.println("[Transaction Server][Transaction "+transID+"] Got Write Instruction.");
+                        System.out.println("[Transaction Server][Transaction "+transID+"]: Got Write Instruction.");
                         try {
                             transaction = (Transaction) message.getContent();
                             int accountID = transaction.getAccountID();
@@ -136,13 +136,13 @@ public class TransactionServer {
                             writeToClient.writeObject(resultObject);
 
                         } catch(Exception e){
-                            System.out.println("[Transaction Server][Transaction "+transID+"] Error in write.");
+                            System.out.println("[Transaction Server][Transaction "+transID+"]: Error in write.");
                         }
 
                         break;
 
                     default:
-                        System.err.println("[Transaction Server][Transaction "+transID+"] Warning: Message type not implemented");
+                        System.err.println("[Transaction Server][Transaction "+transID+"]: Warning: Message type not implemented");
                 }
             } // End while loop
         }

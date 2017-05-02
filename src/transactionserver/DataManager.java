@@ -1,17 +1,17 @@
 package transactionserver;
 
-import static java.util.Arrays.fill;
 import utils.Account;
 import utils.LockTypes;
 
 public class DataManager implements LockTypes {
     
     Account accounts[];
+    int USE_LOCKS = 1;
+    int NUM_ACCOUNTS = 3;
     
     
     public DataManager(){
-        accounts = new Account[10];
-        //fill(accounts, new Account(10));
+        accounts = new Account[NUM_ACCOUNTS];
         
         for(int i=0; i<accounts.length; i++){
             accounts[i] = new Account(10);
@@ -19,20 +19,19 @@ public class DataManager implements LockTypes {
     }
     
     public int getAccountBalance(int accountID, int transID){
-        TransactionServer.lockManager.setLock(accountID, accounts[accountID], transID, READ);
+        if (USE_LOCKS == 1) TransactionServer.lockManager.setLock(accountID, accounts[accountID], transID, READ);    
         int balance = accounts[accountID].getBalance();
-        TransactionServer.lockManager.unLock(accountID, accounts[accountID], transID);
-        //this.printAccounts();
+        if (USE_LOCKS == 1) TransactionServer.lockManager.unLock(accountID, accounts[accountID], transID);
         
         return balance;
     }
     
     public int setAccountBalance(int accountID, int transID, int transferAmt){
-        TransactionServer.lockManager.setLock(accountID, accounts[accountID], transID, WRITE);
+        if (USE_LOCKS == 1) TransactionServer.lockManager.setLock(accountID, accounts[accountID], transID, WRITE);
         accounts[accountID].addToBalance(transferAmt);
         int balance = accounts[accountID].getBalance();
-        TransactionServer.lockManager.unLock(accountID, accounts[accountID], transID);
-        //this.printAccounts();
+        if (USE_LOCKS == 1) TransactionServer.lockManager.unLock(accountID, accounts[accountID], transID);
+
 
         return balance;
     }

@@ -7,7 +7,7 @@ public class TransactionManager {
     
     }
     
-    public int assignTransID(){
+    public synchronized int assignTransID(){
         return transID++;
     }
     
