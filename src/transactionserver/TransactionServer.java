@@ -114,10 +114,15 @@ public class TransactionServer {
                         try{
                             transaction = (Transaction) message.getContent();
                             int accountID = transaction.getAccountID();
+                            System.out.println("[Transaction Server][Transaction "+transID+"]: Got TID.");
 
-                            // TODO Call datamansger to get balance.                     
-                            Object resultObject = dataManager.getAccountBalance(accountID, transID);
+                            // TODO Call datamanager to get balance.                     
+                            //Object resultObject = dataManager.getAccountBalance(accountID, transID);
+                            Object resultObject = transID;
+                            
                             writeToClient.writeObject(resultObject);
+                            
+                            System.out.println("[Transaction Server][Transaction "+transID+"]: Error in writing to object.");
 
                         } catch(Exception e){
                             System.out.println("[Transaction Server][Transaction "+transID+"]: Error in read.");
@@ -132,7 +137,10 @@ public class TransactionServer {
                             int transferAmt = transaction.getAmount();
 
                             // TODO Call datamansger to do transaction.
-                            Object resultObject = dataManager.setAccountBalance(accountID, transID, transferAmt);
+                            //Object resultObject = dataManager.setAccountBalance(accountID, transID, transferAmt);
+                            
+                            Object resultObject = transID;
+                            
                             writeToClient.writeObject(resultObject);
 
                         } catch(Exception e){

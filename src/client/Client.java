@@ -50,7 +50,9 @@ public class Client extends Thread {
                 writeToServer.writeObject(message);
 
                 // Recieve account balance 1 and print output
+                //System.out.println("-------> [Client]: Waiting for Read");
                 int balance = (Integer) readFromServer.readObject();
+                //System.out.println("-------> [Client]: Read");
                 System.out.println("[Client]: Account "+accountID+" has balance: "+balance);
 
                 // Withdraw account balance 1
@@ -101,7 +103,7 @@ public class Client extends Thread {
     
     public static void main(String[] args) {
 
-        for (int i=5; i>0; i--) {
+        for (int i=2; i>0; i--) {
             
             (new Client()).start();
 
