@@ -99,8 +99,17 @@ public class TransactionServer {
                     case OPEN_TRANS:
                         // Use transaction manager
                         transID = transactionManager.assignTransID();
-                        System.out.println("[Transaction Server][Transaction "+transID+"]: Opened Transaction.");
                         
+                        try {
+                            Object resultObject = transID;
+                            
+                            writeToClient.writeObject(resultObject);
+                            
+                            System.out.println("[Transaction Server][Transaction "+transID+"]: Opened Transaction.");
+
+                        } catch(Exception e){
+                            System.out.println("[Transaction Server][Transaction "+transID+"]: Error in Open Transaction.");
+                        }
                         break;
 
                     case CLOSE_TRANS:
@@ -115,14 +124,12 @@ public class TransactionServer {
                             transaction = (Transaction) message.getContent();
                             int accountID = transaction.getAccountID();
                             System.out.println("[Transaction Server][Transaction "+transID+"]: Got TID.");
-
-                            // TODO Call datamanager to get balance.                     
-                            //Object resultObject = dataManager.getAccountBalance(accountID, transID);
-                            Object resultObject = transID;
+                     
+                            Object resultObject = dataManager.getAccountBalance(accountID, transID);
+                            //Object resultObject = transID;
                             
                             writeToClient.writeObject(resultObject);
                             
-                            System.out.println("[Transaction Server][Transaction "+transID+"]: Error in writing to object.");
 
                         } catch(Exception e){
                             System.out.println("[Transaction Server][Transaction "+transID+"]: Error in read.");
@@ -133,10 +140,10 @@ public class TransactionServer {
                         System.out.println("[Transaction Server][Transaction "+transID+"]: Got Write Instruction.");
                         try {
                             transaction = (Transaction) message.getContent();
+                            //System.out.println("HERE");
                             int accountID = transaction.getAccountID();
                             int transferAmt = transaction.getAmount();
 
-                            // TODO Call datamansger to do transaction.
                             //Object resultObject = dataManager.setAccountBalance(accountID, transID, transferAmt);
                             
                             Object resultObject = transID;

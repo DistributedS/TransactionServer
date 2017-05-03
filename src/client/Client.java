@@ -23,7 +23,8 @@ public class Client extends Thread {
     int NUM_TRANS = 3;
     
     public void run() {
-        //for(int i=0; i<NUM_TRANS; i++){
+        int transID;
+        for(int i=0; i<NUM_TRANS; i++){
             
         try { 
             // connect to application server
@@ -39,61 +40,64 @@ public class Client extends Thread {
                 //Open Transaction
                 message = new Message(OPEN_TRANS, null);
                 Transaction readObject;
-                System.out.println("[Client]: Opening Transaction");
                 writeToServer.writeObject(message);
+                
+                transID = (Integer) readFromServer.readObject();
+                System.out.println("[Client][Transaction "+transID+"]: Transaction opened");
 
                 // Read account balance 1
                 int accountID = getRandomInt(0, 9);
                 readObject = new Transaction(accountID, 0);
                 message = new Message(READ, readObject);
-                System.out.println("[Client]: Sending Read Transaction.");
+                System.out.println("[Client][Transaction "+transID+"]: Sending Read Transaction.");
                 writeToServer.writeObject(message);
 
                 // Recieve account balance 1 and print output
                 //System.out.println("-------> [Client]: Waiting for Read");
                 int balance = (Integer) readFromServer.readObject();
                 //System.out.println("-------> [Client]: Read");
-                System.out.println("[Client]: Account "+accountID+" has balance: "+balance);
+                System.out.println("[Client][Transaction "+transID+"]: Account "+accountID+" has balance: "+balance);
 
                 // Withdraw account balance 1
                 int transferAmount = getRandomInt(0, 10);
                 Transaction transObject = new Transaction(accountID, -transferAmount);
                 message = new Message(WRITE, transObject);
-                System.out.println("[Client]: Withdrawing "+transferAmount+" dollars from account "+accountID);
+                System.out.println("[Client][Transaction "+transID+"]: Withdrawing "+transferAmount+" dollars from account "+accountID);
                 writeToServer.writeObject(message);
 
                 // Recieve account balance 1 and print output
                 int postBalance = (Integer) readFromServer.readObject();
-                System.out.println("[Client]: Account "+accountID+" has new balance after withdraw: "+postBalance);
+                System.out.println("[Client][Transaction "+transID+"]: Account "+accountID+" has new balance after withdraw: "+postBalance);
 
                 // Read balance of account to recieve funds
                 int depositAccountID = getRandomInt(0, 9);
                 readObject = new Transaction(depositAccountID, 0);
                 message = new Message(READ, readObject);
-                System.out.println("[Client]: Sending Read Transaction.");
+                System.out.println("[Client][Transaction "+transID+"]: Sending Read Transaction.");
                 writeToServer.writeObject(message);
 
                 // Recieve account balance 2 and print output
                 balance = (Integer) readFromServer.readObject();
-                System.out.println("[Client]: Account "+depositAccountID+" has balance "+balance+" before deposit.");
+                System.out.println("[Client][Transaction "+transID+"]: Account "+depositAccountID+" has balance "+balance+" before deposit.");
 
                 // Withdraw account balance 1
                 transObject = new Transaction(depositAccountID, transferAmount);
                 message = new Message(WRITE, transObject);
 
-                System.out.println("[Client]: Depositing in account "+depositAccountID+" with amount "+transferAmount);
+                System.out.println("[Client][Transaction "+transID+"]: Depositing in account "+depositAccountID+" with amount "+transferAmount);
                 writeToServer.writeObject(message);
 
                 // Close Transaction
                 message = new Message(CLOSE_TRANS, null);
                 writeToServer.writeObject(message);
+                System.out.println("[Client][Transaction "+transID+"]: Closed Transaction");
             
             
 
         } catch (IOException | ClassNotFoundException ex) {
-            System.err.println("[Client]: Error occurred");
+            System.err.println("[Client] Error occurred");
         }
-        //}
+        }
     }
     
     public int getRandomInt(int min, int max){
@@ -103,7 +107,7 @@ public class Client extends Thread {
     
     public static void main(String[] args) {
 
-        for (int i=2; i>0; i--) {
+        for (int i=3; i>0; i--) {
             
             (new Client()).start();
 

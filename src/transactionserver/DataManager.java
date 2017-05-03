@@ -21,10 +21,11 @@ public class DataManager implements LockTypes {
     public int getAccountBalance(int accountID, int transID){
         if (USE_LOCKS == 1) TransactionServer.lockManager.setLock(accountID, accounts[accountID], transID, READ);
         System.out.println("[Data Manager][Transaction]: Get Account Balance");
-        int balance = accounts[accountID].getBalance();
+        //int balance = accounts[accountID].getBalance();
         if (USE_LOCKS == 1) TransactionServer.lockManager.unLock(accountID, accounts[accountID], transID);
         
-        return balance;
+        //return balance;
+        return 69;
     }
     
     public int setAccountBalance(int accountID, int transID, int transferAmt){
