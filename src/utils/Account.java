@@ -17,16 +17,22 @@ public class Account implements LockTypes {
     private int lockType;
     private int numReadLocks;
     private int balance;
+    private int accountID;
     
     
-    public Account(int balance){
+    public Account(int balance, int accountID){
         lockType = LockTypes.NONE;
         numReadLocks = 0;
         this.balance = balance;
+        this.accountID = accountID;
     }
     
     public int getLockType(){
         return lockType;
+    }
+    
+    public int getAccountID(){
+        return accountID;
     }
     
     public void setLockType(int type){
@@ -48,9 +54,6 @@ public class Account implements LockTypes {
         numReadLocks -= 1;
         if(numReadLocks <= 0){
             this.setLockType(NONE);
-        }
-        if(numReadLocks < 0){
-            numReadLocks = 0;
         }
     }
     

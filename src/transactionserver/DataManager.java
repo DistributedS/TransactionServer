@@ -6,7 +6,7 @@ import utils.LockTypes;
 public class DataManager implements LockTypes {
     
     Account accounts[];
-    int USE_LOCKS = 0;
+    int USE_LOCKS = 1;
     int NUM_ACCOUNTS = 4;
     
     
@@ -14,25 +14,25 @@ public class DataManager implements LockTypes {
         accounts = new Account[NUM_ACCOUNTS];
         
         for(int i=0; i<accounts.length; i++){
-            accounts[i] = new Account(10);
+            accounts[i] = new Account(10, i);
         }
     }
     
     public int getAccountBalance(int accountID, int transID){
-        if (USE_LOCKS == 1) TransactionServer.lockManager.setLock(accountID, accounts[accountID], transID, READ);
-        System.out.println("[Data Manager][Transaction]: Get Account Balance");
-        //int balance = accounts[accountID].getBalance();
-        if (USE_LOCKS == 1) TransactionServer.lockManager.unLock(accountID, accounts[accountID], transID);
+        if (USE_LOCKS == 1) TransactionServer.lockManager.setLock(accounts[accountID], transID, READ);
+        System.out.println("[Data Manager][Transaction "+transID+"]: Got Account Balance on account "+accountID+".");
+        int balance = accounts[accountID].getBalance();
+        if (USE_LOCKS == 1) TransactionServer.lockManager.unLock(accounts[accountID], transID);
         
         //return balance;
-        return 69;
+        return balance;
     }
     
     public int setAccountBalance(int accountID, int transID, int transferAmt){
-        if (USE_LOCKS == 1) TransactionServer.lockManager.setLock(accountID, accounts[accountID], transID, WRITE);
+        if (USE_LOCKS == 1) TransactionServer.lockManager.setLock(accounts[accountID], transID, WRITE);
         accounts[accountID].addToBalance(transferAmt);
         int balance = accounts[accountID].getBalance();
-        if (USE_LOCKS == 1) TransactionServer.lockManager.unLock(accountID, accounts[accountID], transID);
+        if (USE_LOCKS == 1) TransactionServer.lockManager.unLock(accounts[accountID], transID);
 
 
         return balance;

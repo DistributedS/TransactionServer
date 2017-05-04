@@ -21,41 +21,41 @@ public class Client extends Thread {
     static final int port = 8008;
     Random random = new Random();
     int NUM_TRANS = 3;
+    int NUM_ACCOUNTS = 4;
     
     public void run() {
         int transID;
+        
         for(int i=0; i<NUM_TRANS; i++){
             
-        try { 
-            // connect to application server
-            Socket server = new Socket(host, port);
-            
-            //Setup Object Streams
-            ObjectOutputStream writeToServer = new ObjectOutputStream(server.getOutputStream());
-            ObjectInputStream readFromServer = new ObjectInputStream(server.getInputStream());
-            
-            Message message;
-            
-            
+            try { 
+                // connect to application server
+                Socket server = new Socket(host, port);
+
+                //Setup Object Streams
+                ObjectOutputStream writeToServer = new ObjectOutputStream(server.getOutputStream());
+                ObjectInputStream readFromServer = new ObjectInputStream(server.getInputStream());
+
+                Message message;
+
                 //Open Transaction
                 message = new Message(OPEN_TRANS, null);
                 Transaction readObject;
                 writeToServer.writeObject(message);
-                
+
                 transID = (Integer) readFromServer.readObject();
                 System.out.println("[Client][Transaction "+transID+"]: Transaction opened");
 
                 // Read account balance 1
-                int accountID = getRandomInt(0, 9);
+                int accountID = getRandomInt(0, NUM_ACCOUNTS-1);
                 readObject = new Transaction(accountID, 0);
                 message = new Message(READ, readObject);
-                System.out.println("[Client][Transaction "+transID+"]: Sending Read Transaction.");
+                System.out.println("[Client][Transaction "+transID+"]: Sending Read Transaction: READ 1 account "+accountID);
                 writeToServer.writeObject(message);
 
                 // Recieve account balance 1 and print output
-                //System.out.println("-------> [Client]: Waiting for Read");
                 int balance = (Integer) readFromServer.readObject();
-                //System.out.println("-------> [Client]: Read");
+
                 System.out.println("[Client][Transaction "+transID+"]: Account "+accountID+" has balance: "+balance);
 
                 // Withdraw account balance 1
@@ -70,10 +70,10 @@ public class Client extends Thread {
                 System.out.println("[Client][Transaction "+transID+"]: Account "+accountID+" has new balance after withdraw: "+postBalance);
 
                 // Read balance of account to recieve funds
-                int depositAccountID = getRandomInt(0, 9);
+                int depositAccountID = getRandomInt(0, NUM_ACCOUNTS-1);
                 readObject = new Transaction(depositAccountID, 0);
                 message = new Message(READ, readObject);
-                System.out.println("[Client][Transaction "+transID+"]: Sending Read Transaction.");
+                System.out.println("[Client][Transaction "+transID+"]:  Sending Read Transaction: READ 2 account "+accountID);
                 writeToServer.writeObject(message);
 
                 // Recieve account balance 2 and print output
@@ -91,12 +91,12 @@ public class Client extends Thread {
                 message = new Message(CLOSE_TRANS, null);
                 writeToServer.writeObject(message);
                 System.out.println("[Client][Transaction "+transID+"]: Closed Transaction");
-            
-            
 
-        } catch (IOException | ClassNotFoundException ex) {
-            System.err.println("[Client] Error occurred");
-        }
+
+
+            } catch (IOException | ClassNotFoundException ex) {
+                System.err.println("[Client] Error occurred");
+            }
         }
     }
     
@@ -107,7 +107,7 @@ public class Client extends Thread {
     
     public static void main(String[] args) {
 
-        for (int i=3; i>0; i--) {
+        for (int i=10; i>0; i--) {
             
             (new Client()).start();
 

@@ -12,75 +12,57 @@ public class LockManager implements LockTypes {
     
     public LockManager(){
         theLocks = new HashMap<>();
-        waitType = NONE;
     }
     
     //Object is an account
-    public synchronized void setLock(int accountID, Account objAccount, int transID, int lockType){
-        
-        //Check if something is conflict, checks for cases where you it is not a conflict -> rest is conflicts.
-        //boolean isConfict
-        // no conflict if:
-        // 1) lock holder empty -> all other holds lock holders.
-        // 2) you are sole lock holder.
-        // 3) currentlock type is read and newlocktype is also read
-        // else lock is not conflict.
-            
+    public synchronized void setLock(Account objAccount, int transID, int lockType){
+ 
         //Check hashmap for current accountID
-        if(theLocks.containsKey(accountID)){ //Don't have to insert this account to hashmap
+        if(theLocks.containsKey(objAccount.getAccountID())){ //Don't have to insert this account to hashmap
             
-            // Share a read lock
-            if(lockType == READ && objAccount.getLockType() == READ) {
-                objAccount.setLockType(lockType);
-                System.out.println("[Lock Manager][Transaction "+transID+"]: Sharing read lock on account "+accountID+".");
-            
-                // No other transactions have a lock on the account
-            } else if(objAccount.getLockType() == NONE) {
-                objAccount.setLockType(lockType);
-                System.out.println("[Lock Manager][Transaction "+transID+"]: Set type "+lockType+" on account "+accountID+".");
-                
-            } else {
-            
-            // set Write with read -> wait
-            // set Read with a write -> wait
-            // set Write with write -> wait
-            // set either with none
-            
-            //if(lockType == WRITE){
-            //    waitType = NONE;
-            //}
-            if(lockType == READ){
-                waitType = READ;
-                //System.out.println("Wait type is READ for account "+accountID);
-            }
-            System.out.println("Wait type is "+waitType+" lock type on account "+accountID+" is "+objAccount.getLockType());
-            while(objAccount.getLockType() != NONE || objAccount.getLockType() != waitType) {
+            while(isConflict(objAccount, transID, lockType)) {
                 try {
-                    System.out.println("waiting");
+                    System.out.println("[Transaction "+transID+"] Waiting on account "+objAccount.getAccountID()+".");
                     wait();
                 }catch ( InterruptedException e){/*...*/ }
             }
-            waitType = NONE;
             
             //Out of waiting loop, can set locks now
             objAccount.setLockType(lockType);
-            System.out.println("[Lock Manager][Transaction "+transID+"]: Set type "+lockType+" on account "+accountID+".");
-            }
-            
-        }
+            System.out.println("ALREADY ADDED [Lock Manager][Transaction "+transID+"]: Set type "+lockType+" on account "+objAccount.getAccountID()+".");
+             
         // If there is not lock on the account and not in hash map.
-        else{
+        }else{
             objAccount.setLockType(lockType);
-            theLocks.put(accountID, objAccount);
-            System.out.println("[Lock Manager][Transaction "+transID+"]: Set type "+lockType+" on account "+accountID+".");
-            
-        }   
+            theLocks.put(objAccount.getAccountID(), objAccount);
+            System.out.println("ADDED [Lock Manager][Transaction "+transID+"]: Set type "+lockType+" on account "+objAccount.getAccountID()+".");
+        }
     }
+    
     // synchronize this one because we want to remove all entries
-    public synchronized void unLock(int accountID, Account objAccount, int transID) {
+    public synchronized void unLock(Account objAccount, int transID) {
         objAccount.removeLock();
-        System.out.println("[Lock Manager][Transaction "+transID+"]: Removed lock on account "+accountID+".");
-    
+        System.out.println("[Lock Manager][Transaction "+transID+"]: Removed lock on account "+objAccount.getAccountID()+".");
+        notifyAll(); 
     }
     
+    //Check if something is conflict, checks for cases where you it is not a conflict -> rest is conflicts.
+    //boolean isConfict
+    // no conflict if:
+    // 1) lock holder empty -> all other holds lock holders.
+    // 2) you are sole lock holder.
+    // 3) currentlock type is read and newlocktype is also read
+    // else lock is not conflict.
+    public boolean isConflict(Account objAccount, int transID, int lockType){
+        // Nobody else holds the lock
+        if(objAccount.getLockType() == NONE) {
+            return false;
+        }
+        // Current lock is read on Account and new lock is also read
+        if (lockType == READ && objAccount.getLockType() == READ) {
+            return false;
+        }
+        
+        return true;
+    }
 }

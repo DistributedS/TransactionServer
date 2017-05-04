@@ -66,6 +66,8 @@ public class TransactionServer {
         Message message = null;
         Transaction transaction;
         int transID;
+        int accountID;
+        Object resultObject;
 
         private ServerThread(Socket client) {
             this.client = client;
@@ -101,7 +103,7 @@ public class TransactionServer {
                         transID = transactionManager.assignTransID();
                         
                         try {
-                            Object resultObject = transID;
+                            resultObject = transID;
                             
                             writeToClient.writeObject(resultObject);
                             
@@ -119,39 +121,42 @@ public class TransactionServer {
                         break loop;
 
                     case READ:
-                        System.out.println("[Transaction Server][Transaction "+transID+"]: Got Read Instruction.");
+                        
+                        transaction = (Transaction) message.getContent();
+
+                        accountID = transaction.getAccountID();
+                        
+                        System.out.println("[Transaction Server][Transaction "+transID+"]: Got Read Instruction on account "+accountID+".");
+
+                        resultObject = dataManager.getAccountBalance(accountID, transID);
+                        
                         try{
-                            transaction = (Transaction) message.getContent();
-                            int accountID = transaction.getAccountID();
-                            System.out.println("[Transaction Server][Transaction "+transID+"]: Got TID.");
-                     
-                            Object resultObject = dataManager.getAccountBalance(accountID, transID);
-                            //Object resultObject = transID;
-                            
-                            writeToClient.writeObject(resultObject);
-                            
+                            writeToClient.writeObject(resultObject);    
 
                         } catch(Exception e){
-                            System.out.println("[Transaction Server][Transaction "+transID+"]: Error in read.");
+                            System.out.println("[Transaction Server][Transaction "+transID+"]: Error in read: Writing result to client socket.");
                         }
                         break;
 
                     case WRITE:
-                        System.out.println("[Transaction Server][Transaction "+transID+"]: Got Write Instruction.");
-                        try {
-                            transaction = (Transaction) message.getContent();
-                            //System.out.println("HERE");
-                            int accountID = transaction.getAccountID();
-                            int transferAmt = transaction.getAmount();
+                        
+                        
+                        transaction = (Transaction) message.getContent();
 
-                            //Object resultObject = dataManager.setAccountBalance(accountID, transID, transferAmt);
-                            
-                            Object resultObject = transID;
-                            
+                        accountID = transaction.getAccountID();
+                        int transferAmt = transaction.getAmount();
+                        
+                        System.out.println("[Transaction Server][Transaction "+transID+"]: Got Write Instruction "+accountID+".");
+
+                        Object resultObject = dataManager.setAccountBalance(accountID, transID, transferAmt);
+
+                        //resultObject = transID;
+                        
+                        try {    
                             writeToClient.writeObject(resultObject);
 
                         } catch(Exception e){
-                            System.out.println("[Transaction Server][Transaction "+transID+"]: Error in write.");
+                            System.out.println("[Transaction Server][Transaction "+transID+"]: Error in write: Writing result back to client socket.");
                         }
 
                         break;
