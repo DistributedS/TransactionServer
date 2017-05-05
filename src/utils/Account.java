@@ -16,6 +16,7 @@ public class Account implements LockTypes {
     
     private int lockType;
     private int numReadLocks;
+    private int lockTransID;
     private int balance;
     private int accountID;
     
@@ -31,14 +32,22 @@ public class Account implements LockTypes {
         return lockType;
     }
     
+    public int getLockTransID(){
+        return lockTransID;
+    }
+    
     public int getAccountID(){
         return accountID;
     }
     
-    public void setLockType(int type){
+    public void setLockType(int type, int transID){
         lockType = type;
         if(type == READ){
             this.addReadLock();
+        }
+        // If you are setting a write lock there cannot be any set read locks.
+        if(type == WRITE){
+            numReadLocks = 0;
         }
     }
     
@@ -53,7 +62,7 @@ public class Account implements LockTypes {
     public void removeReadLock(){
         numReadLocks -= 1;
         if(numReadLocks <= 0){
-            this.setLockType(NONE);
+            this.setLockType(NONE, -1);
         }
     }
     
@@ -62,7 +71,7 @@ public class Account implements LockTypes {
             this.removeReadLock();
         }
         else{
-            this.setLockType(NONE);
+            this.setLockType(NONE, -1);
         }
     }
     

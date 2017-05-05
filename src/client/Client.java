@@ -5,8 +5,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import utils.Message;
 import static utils.MessageTypes.CLOSE_TRANS;
 import static utils.MessageTypes.OPEN_TRANS;

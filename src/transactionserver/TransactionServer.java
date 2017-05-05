@@ -134,7 +134,7 @@ public class TransactionServer {
                             writeToClient.writeObject(resultObject);    
 
                         } catch(Exception e){
-                            System.out.println("[Transaction Server][Transaction "+transID+"]: Error in read: Writing result to client socket.");
+                            System.out.println("[Transaction Server][Transaction "+transID+"]: Error in read: Writing result to client socket."+e);
                         }
                         break;
 
@@ -148,15 +148,13 @@ public class TransactionServer {
                         
                         System.out.println("[Transaction Server][Transaction "+transID+"]: Got Write Instruction "+accountID+".");
 
-                        Object resultObject = dataManager.setAccountBalance(accountID, transID, transferAmt);
-
-                        //resultObject = transID;
+                        resultObject = dataManager.setAccountBalance(accountID, transID, transferAmt);
                         
                         try {    
                             writeToClient.writeObject(resultObject);
 
                         } catch(Exception e){
-                            System.out.println("[Transaction Server][Transaction "+transID+"]: Error in write: Writing result back to client socket.");
+                            System.out.println("[Transaction Server][Transaction "+transID+"]: Error in write: Writing result back to client socket: "+e);
                         }
 
                         break;

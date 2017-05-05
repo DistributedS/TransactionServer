@@ -28,12 +28,12 @@ public class LockManager implements LockTypes {
             }
             
             //Out of waiting loop, can set locks now
-            objAccount.setLockType(lockType);
+            objAccount.setLockType(lockType, transID);
             System.out.println("ALREADY ADDED [Lock Manager][Transaction "+transID+"]: Set type "+lockType+" on account "+objAccount.getAccountID()+".");
              
         // If there is not lock on the account and not in hash map.
         }else{
-            objAccount.setLockType(lockType);
+            objAccount.setLockType(lockType, transID);
             theLocks.put(objAccount.getAccountID(), objAccount);
             System.out.println("ADDED [Lock Manager][Transaction "+transID+"]: Set type "+lockType+" on account "+objAccount.getAccountID()+".");
         }
@@ -60,6 +60,10 @@ public class LockManager implements LockTypes {
         }
         // Current lock is read on Account and new lock is also read
         if (lockType == READ && objAccount.getLockType() == READ) {
+            return false;
+        }
+        // If locktype == write AND objAccount.numreadlocks == 1 AND objAccount.getLockTransID = transID -> no conflict, upgrade
+        if(lockType == WRITE && objAccount.totalReadLocks() == 1 && objAccount.getLockTransID() == transID) {
             return false;
         }
         
